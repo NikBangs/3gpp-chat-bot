@@ -84,20 +84,20 @@ def build_semantic_graph(sections_10: dict, sections_17: dict):
     return G
 
 
-# def build_graph_from_sections(sections: dict):
-#     """
-#     Builds a simple directed graph from sections of a single version.
-#     Nodes contain section_id and text.
-#     Edges are added for section references (e.g., mentions of 4.2.1 in 5.3).
-#     """
-#     G = nx.DiGraph()
+def build_graph_from_sections(sections: dict):
+    """
+    Builds a simple directed graph from sections of a single version.
+    Nodes contain section_id and text.
+    Edges are added for section references (e.g., mentions of 4.2.1 in 5.3).
+    """
+    G = nx.DiGraph()
 
-#     for sid, text in sections.items():
-#         norm_id = normalize_section_id(sid)
-#         G.add_node(norm_id, section_id=norm_id, text=text.strip())
+    for sid, text in sections.items():
+        norm_id = normalize_section_id(sid)
+        G.add_node(norm_id, section_id=norm_id, text=text.strip())
 
-#         for ref in extract_references(text):
-#             if ref != norm_id:
-#                 G.add_edge(norm_id, ref, reason="mentions")
+        for ref in extract_references(text):
+            if ref != norm_id:
+                G.add_edge(norm_id, ref, reason="mentions")
 
-#     return G
+    return G

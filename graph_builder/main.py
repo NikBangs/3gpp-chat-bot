@@ -9,13 +9,15 @@ import subprocess
 # --- Project modules ---
 from parser.read_doc import read_doc
 from parser.split_sections import split_docx_into_sections, split_text_into_sections 
-from graphs.builder import build_semantic_graph
-from graphs.visualizer import visualize_semantic_graph
+from graphs.builder import build_semantic_graph, build_graph_from_sections
+from graphs.visualizer import visualize_semantic_graph, export_to_html
 from graphs.traversals import downstream_impact
 from graphs.summarizer import generate_user_friendly_summary
 
 BASE_DIR = Path(__file__).resolve().parent.parent  # Goes up to 3GPP Chat Bot/
 DATA_DIR = BASE_DIR / "data"
+GRAPH_DIR = DATA_DIR / "graphs"
+VIEW_DIR = DATA_DIR / "graph_views"
 
 def sanitize_keys(data):
     return {str(k): v for k, v in data.items()}
@@ -61,7 +63,9 @@ def main():
     graph_path = DATA_DIR / "unified_graph.pkl"
     changes_path = DATA_DIR / "changes.json"
 
-    os.makedirs("data", exist_ok=True)
+    os.makedirs(DATA_DIR, exist_ok=True)
+    os.makedirs(GRAPH_DIR, exist_ok=True)
+    os.makedirs(VIEW_DIR, exist_ok=True)
 
     # -------- Cached Mode --------
     if graph_path.exists() and changes_path.exists():
@@ -71,13 +75,47 @@ def main():
             changes = json.load(f)
 
         try:
-            print("📄 Re-reading documents for tooltip rendering...")
+            print("📄 Re-reading documents for tooltip rendering and fallback graph generation...")
             text10 = read_doc(rel10_path)
             sections10_raw = split_text_into_sections(text10)
             sections17_raw = split_docx_into_sections(rel17_path)
 
             sections10 = normalize_keys(sections10_raw)
             sections17 = normalize_keys(sections17_raw)
+
+            # 🔁 Build individual graphs if missing
+            graph10_path = GRAPH_DIR / "graph_10.pkl"
+            graph17_path = GRAPH_DIR / "graph_17.pkl"
+            html10_path = VIEW_DIR / "graph_10.html"
+            html17_path = VIEW_DIR / "graph_17.html"
+
+            if not graph10_path.exists() or not graph17_path.exists():
+                print("🔄 Individual version graph .pkl files missing. Rebuilding...")
+                flattened10 = {sid: flatten_section(sec) for sid, sec in sections10.items()}
+                flattened17 = {sid: flatten_section(sec) for sid, sec in sections17.items()}
+
+                graph10 = build_graph_from_sections(flattened10)
+                graph17 = build_graph_from_sections(flattened17)
+
+                with open(graph10_path, "wb") as f:
+                    pickle.dump(graph10, f)
+                with open(graph17_path, "wb") as f:
+                    pickle.dump(graph17, f)
+
+                print("✅ Individual .pkl graphs saved.")
+
+            if not html10_path.exists() or not html17_path.exists():
+                print("🔄 HTML graph views missing. Regenerating...")
+                if 'graph10' not in locals():
+                    flattened10 = {sid: flatten_section(sec) for sid, sec in sections10.items()}
+                    graph10 = build_graph_from_sections(flattened10)
+                if 'graph17' not in locals():
+                    flattened17 = {sid: flatten_section(sec) for sid, sec in sections17.items()}
+                    graph17 = build_graph_from_sections(flattened17)
+
+                export_to_html(graph10, html10_path, title="3GPP Rel-10 Graph")
+                export_to_html(graph17, html17_path, title="3GPP Rel-17 Graph")
+                print("✅ Individual HTML graph views saved.")
         except Exception as e:
             print(f"❌ Failed to re-read documents for visualization: {e}")
             return
@@ -114,6 +152,19 @@ def main():
         G = build_semantic_graph(flattened10, flattened17)
 
         print(f"✅ Graph built with {len(G.nodes)} nodes and {len(G.edges)} edges.")
+
+        # -------- Individual Version Graphs --------
+        graph10 = build_graph_from_sections(flattened10)
+        graph17 = build_graph_from_sections(flattened17)
+
+        with open(GRAPH_DIR / "graph_10.pkl", "wb") as f:
+            pickle.dump(graph10, f)
+        with open(GRAPH_DIR / "graph_17.pkl", "wb") as f:
+            pickle.dump(graph17, f)
+
+        export_to_html(graph10, VIEW_DIR / "graph_10.html", title="3GPP Rel-10 Graph")
+        export_to_html(graph17, VIEW_DIR / "graph_17.html", title="3GPP Rel-17 Graph")
+        print("📦 Individual version graphs saved in 'graphs/' and visualized in 'graph_views/'")
 
         # -------- Summarize Nodes with GPT --------
         try:

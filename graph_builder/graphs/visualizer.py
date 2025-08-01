@@ -118,76 +118,47 @@ def visualize_semantic_graph(graph: nx.DiGraph, output_html="graph.html", sectio
     net.write_html(output_html)
 
 
+def export_to_html(graph: nx.DiGraph, output_path, title="Graph View"):
 
-# # for separate versions
-# def export_graph_html(graph: nx.DiGraph, output_html="graph.html", sections=None, height="700px", width="100%"):
-#     """
-#     Generates an interactive HTML visualization of the graph using pyvis.
-#     Optionally enriches node tooltips using the provided sections dictionary.
-#     """
+    net = Network(height="800px", width="100%", bgcolor="#ffffff", font_color="#000000", directed=True)
+    net.force_atlas_2based()
 
-#     net = Network(height=height, width=width, directed=True)
-#     net.barnes_hut()
+    for node, attrs in graph.nodes(data=True):
+        label = f"{attrs.get('section_id', node)}"
+        net.add_node(node, label=label, title=attrs.get("text", ""), shape="dot")
 
-#     for node_id, attrs in graph.nodes(data=True):
-#         label = attrs.get("title", node_id)
-#         tooltip = attrs.get("text", "")
+    for src, dst, edata in graph.edges(data=True):
+        net.add_edge(src, dst, title=edata.get("reason", "linked"))
 
-#         # Fallback to external section dict if available
-#         if not tooltip and sections and node_id in sections:
-#             section = sections[node_id]
-#             title = section.get("title", "")
-#             content = "\n".join(p.get("text", "") for p in section.get("content", []))
-#             tooltip = f"<b>{title}</b><br>{content}" if title else content
+    net.set_options("""
+    {
+      "nodes": {
+        "font": { "size": 14 },
+        "borderWidth": 1
+      },
+      "edges": {
+        "smooth": true,
+        "arrows": { "to": { "enabled": true } }
+      },
+      "physics": {
+        "forceAtlas2Based": {
+          "gravitationalConstant": -50,
+          "centralGravity": 0.01,
+          "springLength": 100,
+          "springConstant": 0.08
+        },
+        "maxVelocity": 20,
+        "solver": "forceAtlas2Based",
+        "timestep": 0.35,
+        "stabilization": { "iterations": 150 }
+      }
+    }
+    """)
 
-#         node_type = attrs.get("type", "")
+    # Set a page title
+    html_title = f"<title>{title}</title>\n"
+    net_html = net.generate_html()
+    net_html = net_html.replace("<title>Network | Pyvis</title>", html_title)
 
-#         color = {
-#             "added": "#A1E3A1",
-#             "removed": "#F5A1A1",
-#             "modified": "#FFE099",
-#             "unchanged": "#D3D3D3",
-#             "single": "#B5D5FF",  # new type for single-version graphs
-#         }.get(node_type, "#FFFFFF")
-
-#         net.add_node(node_id, label=label[:100], title=tooltip, color=color)
-
-#     for src, dst, edge_attrs in graph.edges(data=True):
-#         label = edge_attrs.get("reason", "")
-#         net.add_edge(src, dst, label=label)
-
-#     net.set_options("""
-#     var options = {
-#       "nodes": {
-#         "shape": "dot",
-#         "size": 16,
-#         "font": {
-#           "size": 14,
-#           "face": "arial"
-#         }
-#       },
-#       "edges": {
-#         "arrows": {
-#           "to": {
-#             "enabled": true
-#           }
-#         },
-#         "smooth": false
-#       },
-#       "interaction": {
-#         "hover": true,
-#         "navigationButtons": true
-#       },
-#       "physics": {
-#         "enabled": true,
-#         "barnesHut": {
-#           "gravitationalConstant": -30000,
-#           "centralGravity": 0.3,
-#           "springLength": 95
-#         },
-#         "minVelocity": 0.75
-#       }
-#     }
-#     """)
-
-#     net.show(output_html)
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write(net_html)
