@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 function Chat({ messages, onSend }) {
   const [input, setInput] = useState("");
+  const bottomRef = useRef(null);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -10,29 +11,33 @@ function Chat({ messages, onSend }) {
     setInput("");
   };
 
+  // Auto-scroll to latest message
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-y-auto border p-2 rounded bg-white">
+    <div className="chat-wrapper">
+      <div className="chat-box">
         {messages.map((msg, i) => (
-          <div key={i} className={`mb-2 text-sm ${msg.sender === "user" ? "text-right" : "text-left"}`}>
-            <div className={`inline-block px-3 py-2 rounded ${msg.sender === "user" ? "bg-blue-500 text-white" : "bg-gray-200"}`}>
-              {msg.text}
-            </div>
+          <div
+            key={i}
+            className={`chat-message ${msg.sender === "user" ? "user" : "assistant"}`}
+          >
+            <div className="chat-bubble">{msg.text}</div>
           </div>
         ))}
+        <div ref={bottomRef} />
       </div>
 
-      <form onSubmit={handleSubmit} className="mt-4 flex gap-2">
+      <form onSubmit={handleSubmit} className="chat-input">
         <input
           type="text"
-          className="flex-1 border px-3 py-2 rounded"
-          placeholder="Ask a question about the spec..."
+          placeholder="Ask a question..."
           value={input}
           onChange={(e) => setInput(e.target.value)}
         />
-        <button className="bg-blue-600 text-white px-4 py-2 rounded" type="submit">
-          Send
-        </button>
+        <button type="submit">Send</button>
       </form>
     </div>
   );
