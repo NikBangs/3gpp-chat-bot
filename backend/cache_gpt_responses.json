@@ -1,0 +1,4 @@
+{
+  "what is 3gpp?": "3GPP stands for 3rd Generation Partnership Project. It is a collaboration between various standardization organizations to develop specifications for mobile telecommunications systems.",
+  "explain handover in urllc": "Handover in URLLC (Ultra-Reliable Low Latency Communication) refers to the process of transferring a communication session from one radio access technology (RAT) to another, such as from LTE to GSM or UMTS. This is important for ensuring seamless connectivity and maintaining communication quality, especially in scenarios where reliability and low latency are critical, as in URLLC applications. The handover process involves the UE (User Equipment) switching between different networks while maintaining the ongoing communication session."
+}
