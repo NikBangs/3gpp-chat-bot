@@ -8,14 +8,7 @@ html, body, #root {
 
 .app-container {
   display: flex;
-  /* flex-direction: column; */
   height: 100vh;
-  /* overflow: hidden; */
-}
-
-.chat-container {
-  padding: 20px;
-  border-bottom: 1px solid #ddd;
 }
 
 .chat-box {
@@ -38,11 +31,6 @@ html, body, #root {
   color: #2e7d32;
 }
 
-.chat-error {
-  color: red;
-  margin-top: 10px;
-}
-
 .chat-input {
   margin-top: 10px;
   display: flex;
@@ -57,7 +45,6 @@ html, body, #root {
 .chat-input button {
   padding: 8px 16px;
 }
-
 
 .graph-panel {
   flex: 2;

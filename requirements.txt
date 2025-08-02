@@ -5,16 +5,12 @@ pywin32>=306; sys_platform == "win32"  # For .doc file processing on Windows
 # Data science and machine learning
 numpy>=1.21.0
 scikit-learn>=1.0.0
-nltk>=3.6.0
 sentence-transformers>=2.2.0
+torch>=1.9.0  # Required for sentence-transformers
 
 # Graph processing and visualization
 networkx>=2.6.0
 pyvis>=0.3.0
-
-# Web scraping and parsing
-beautifulsoup4>=4.10.0
-lxml>=4.6.0
 
 # GUI and web interface
 PyQt5>=5.15.0
@@ -24,11 +20,14 @@ PyQtWebEngine>=5.15.0
 Flask>=2.0.0
 Flask-CORS>=3.0.10
 
-# Progress tracking
-tqdm>=4.62.0
-
 # Environment and configuration
 python-dotenv>=0.19.0
 
 # OpenAI integration
 openai>=1.0.0
+
+# Note: The following dependencies were removed during optimization:
+# - nltk>=3.6.0 (not used in current implementation)
+# - beautifulsoup4>=4.10.0 (not used in current implementation)
+# - lxml>=4.6.0 (not used in current implementation)
+# - tqdm>=4.62.0 (not used in current implementation)

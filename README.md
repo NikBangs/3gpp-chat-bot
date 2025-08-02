@@ -6,17 +6,18 @@ A sophisticated chat bot application that analyzes 3GPP technical documents and 
 
 - **Document Analysis**: Processes 3GPP technical documents (.doc, .docx)
 - **Semantic Graph**: Creates interactive knowledge graphs from document content
-- **AI-Powered Chat**: Uses OpenAI GPT for intelligent responses
+- **AI-Powered Chat**: Uses OpenAI GPT for intelligent responses with caching
 - **Visual Interface**: React-based frontend with interactive graph visualization
 - **Change Tracking**: Identifies and highlights changes between document versions
-- **Search & Query**: Advanced search capabilities with TF-IDF and semantic similarity
+- **Smart Caching**: Fuzzy matching for similar queries to improve response times
+- **Responsive Design**: Modern UI with real-time chat and graph interaction
 
 ## 🏗️ Architecture
 
 ```
 3GPP Chat Bot/
-├── backend/           # Flask API server
-├── frontend/          # React web application
+├── backend/           # Flask API server with caching and AI integration
+├── frontend/          # React web application with graph visualization
 ├── graph_builder/     # Document processing and graph generation
 ├── data/             # Document storage and generated graphs
 └── lib/              # Shared libraries and assets
@@ -27,13 +28,13 @@ A sophisticated chat bot application that analyzes 3GPP technical documents and 
 - Python 3.8+
 - Node.js 16+
 - OpenAI API key
-- Windows (for .doc file processing)
+- Windows (for .doc file processing with pywin32)
 
 ## 🛠️ Installation
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/yourusername/3gpp-chat-bot.git
+git clone https://github.com/NikBangs/3gpp-chat-bot.git
 cd 3gpp-chat-bot
 ```
 
@@ -99,22 +100,34 @@ python run_graph_gui.py
 ## 📁 Project Structure
 
 ### Backend (`backend/`)
-- `app.py` - Flask API server with search and query endpoints
+- `app.py` - Flask API server with search, query endpoints, and intelligent caching
+- `cache_gpt_responses.json` - Cached responses for improved performance
 
 ### Frontend (`frontend/`)
-- React application with interactive graph visualization
-- Chat interface for querying the knowledge base
+- `src/App.js` - Main React application component
+- `src/Chat.js` - Chat interface component
+- `src/Graph.js` - Interactive graph visualization component
+- `src/index.css` - Application styling
 
 ### Graph Builder (`graph_builder/`)
 - `main.py` - Main document processing pipeline
 - `parser/` - Document parsing and section splitting
+  - `read_doc.py` - Document reading for .doc and .docx files
+  - `split_sections.py` - Section extraction and structuring
 - `graphs/` - Graph building, visualization, and analysis
+  - `builder.py` - Semantic graph construction
+  - `visualizer.py` - Graph visualization and HTML export
+  - `traversals.py` - Graph traversal and impact analysis
+  - `summarizer.py` - User-friendly summary generation
+  - `summarize_nodes.py` - GPT-powered node summarization
 - `ui/` - Desktop GUI for graph viewing
+- `test_graph.py` - Graph testing and inspection utilities
 
 ### Data (`data/`)
-- Document storage
-- Generated graph files
-- Visualization outputs
+- Document storage (3GPP .doc/.docx files)
+- Generated graph files (.pkl)
+- Visualization outputs (HTML)
+- Change tracking data (JSON)
 
 ## 🔧 Configuration
 
@@ -122,10 +135,34 @@ python run_graph_gui.py
 Place your 3GPP documents in the `data/` directory:
 - Supported formats: `.doc`, `.docx`
 - Documents are automatically processed and converted to semantic graphs
+- Change detection between document versions
 
 ### API Configuration
 - OpenAI API key required for advanced chat features
-- TF-IDF search available without API key
+- Intelligent caching system for improved response times
+- Fuzzy matching for similar queries
+
+### Performance Optimizations
+- Response caching with LRU eviction (max 50 entries)
+- Semantic similarity matching for cache hits
+- Optimized graph loading and processing
+
+## 🎯 Key Features
+
+### Smart Caching System
+- Fuzzy matching for similar queries (85% similarity threshold)
+- Automatic cache management with size limits
+- Improved response times for repeated queries
+
+### Interactive Graph Visualization
+- Real-time graph rendering with D3.js
+- Node highlighting based on query relevance
+- Responsive design for different screen sizes
+
+### Document Analysis
+- Automatic section extraction and structuring
+- Change detection between document versions
+- Semantic similarity analysis for content comparison
 
 ## 🤝 Contributing
 
@@ -145,7 +182,15 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - OpenAI for GPT integration
 - React and Flask communities
 - NetworkX for graph processing
+- Sentence Transformers for semantic similarity
 
 ## 📞 Support
 
-For support and questions, please open an issue on GitHub or contact the development team. 
+For support and questions, please open an issue on GitHub or contact the development team.
+
+## 🔄 Recent Updates
+
+- **Code Cleanup**: Removed unused imports and dependencies
+- **Performance Optimization**: Improved caching system and response times
+- **UI Improvements**: Cleaner React components and styling
+- **Documentation**: Enhanced README with detailed project structure 

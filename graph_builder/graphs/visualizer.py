@@ -114,7 +114,6 @@ def visualize_semantic_graph(graph: nx.DiGraph, output_html="graph.html", sectio
     }
     """)
 
-    #net.show_buttons(filter_=["physics"])  # Optional
     net.write_html(output_html)
 
 

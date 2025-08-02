@@ -4,7 +4,6 @@ import pickle
 import networkx as nx
 import os
 import sys
-import subprocess
 
 # --- Project modules ---
 from parser.read_doc import read_doc
@@ -31,6 +30,7 @@ def write_changes_json(changes, path="data/changes.json"):
         print(f"❌ Failed to write changes.json: {e}")
 
 def launch_graph_gui():
+    import subprocess
     script_dir = Path(__file__).resolve().parent
     gui_script = script_dir / "ui" / "run_graph_gui.py"
 
