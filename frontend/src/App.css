@@ -1,1 +1,8 @@
-/* App-specific styles can be added here if needed */
+/* 3GPP Chatbot - Custom styles that complement the design system */
+
+#root {
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Additional custom styles can go here if needed */

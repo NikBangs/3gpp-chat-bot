@@ -14,6 +14,7 @@ from graphs.traversals import downstream_impact
 from graphs.summarizer import generate_user_friendly_summary
 
 BASE_DIR = Path(__file__).resolve().parent.parent  # Goes up to 3GPP Chat Bot/
+FRONTEND_PUBLIC_DATA_DIR = BASE_DIR / "frontend" / "public" / "data"
 DATA_DIR = BASE_DIR / "data"
 GRAPH_DIR = DATA_DIR / "graphs"
 VIEW_DIR = DATA_DIR / "graph_views"
@@ -191,8 +192,10 @@ def main():
 
     # -------- Visualization --------
     print("🌐 Generating interactive visualization...")
-    output_path = DATA_DIR / "graph.html"
-    visualize_semantic_graph(G, output_html=str(output_path), sections10=sections10, sections17=sections17)
+    data_output_path = DATA_DIR / "graph.html"
+    frontend_output_path = FRONTEND_PUBLIC_DATA_DIR / "graph.html"
+    visualize_semantic_graph(G, output_html=str(data_output_path), sections10=sections10, sections17=sections17)
+    visualize_semantic_graph(G, output_html=str(frontend_output_path), sections10=sections10, sections17=sections17)
     print("🎉 Visualization saved to graph.html")
 
     # -------- Optional: Impact Test --------
