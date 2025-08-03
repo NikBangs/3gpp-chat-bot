@@ -157,10 +157,23 @@ def query():
             })
 
         # Construct AI prompt
-        prompt = f"""You are an expert assistant helping explain technical documentation.
+        prompt = f"""
+You are an expert assistant helping explain telecom technical documentation to engineers and curious professionals.
+
+Strictly use only the information from the context below to answer the user's question. 
+Do not add external knowledge or make up content.
+
+Format your answer in a clean and structured way:
+- Use plain text for explanations.
+- Use bullet points or tables only when the content naturally fits that format (e.g., lists of features, differences, conditions).
+- Avoid redundant phrases or overuse of formatting.
+
+---
 
 Question:
 {query_text}
+
+---
 
 Context:
 {full_context}
@@ -178,16 +191,22 @@ Context:
             max_tokens = 400
             style_note = "Keep your response concise but informative."
 
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": f"Use only the context provided to answer. Be clear and accurate. {style_note}"},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.4,
-            max_tokens=max_tokens
-        )
-        answer = response.choices[0].message.content.strip()
+        try:
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": f"You are a helpful technical assistant. Only answer based on the provided context. Structure your response naturally using plain text, bullet points, or tables when appropriate. {style_note}"},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.4,
+                max_tokens=max_tokens
+            )
+            answer = response.choices[0].message.content.strip()
+        except Exception as e:
+            print("❌ Error during OpenAI request:", e)
+            return jsonify({"answer": "Sorry, the AI model failed to respond.", "highlight": []}), 500
+        
+        print("🔍 Final Answer Preview:\n", answer)
         save_cache(query_text, answer)
 
         return jsonify({

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { marked } from "marked";
 
 function Chat({ messages, onSend }) {
   const [input, setInput] = useState("");
@@ -24,7 +25,15 @@ function Chat({ messages, onSend }) {
             key={i}
             className={`chat-message ${msg.sender === "user" ? "user" : "assistant"}`}
           >
-            <div className="chat-bubble">{msg.text}</div>
+            <div
+              className="chat-bubble"
+              dangerouslySetInnerHTML={{
+                __html:
+                  msg.sender === "assistant"
+                    ? marked.parse(msg.text)
+                    : msg.text,
+              }}
+            />
           </div>
         ))}
         <div ref={bottomRef} />

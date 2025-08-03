@@ -31,6 +31,49 @@ html, body, #root {
   color: #2e7d32;
 }
 
+.chat-bubble ul {
+  padding-left: 1.2em;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.chat-bubble li {
+  margin-bottom: 0.3em;
+}
+
+.chat-bubble p {
+  margin: 0.5em 0;
+}
+
+.chat-bubble strong {
+  font-weight: bold;
+}
+
+.chat-bubble em {
+  font-style: italic;
+}
+
+.chat-bubble table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5em;
+}
+
+.chat-bubble th,
+.chat-bubble td {
+  border: 1px solid #ccc;
+  padding: 4px 8px;
+  text-align: left;
+  font-size: 0.9em;
+}
+
+.chat-bubble pre {
+  background-color: #f4f4f4;
+  padding: 8px;
+  overflow-x: auto;
+  font-family: monospace;
+}
+
 .chat-input {
   margin-top: 10px;
   display: flex;
