@@ -67,6 +67,13 @@ OPENAI_API_KEY=your_openai_api_key_here
 
 ## 🚀 Usage
 
+### Processing Documents and Generate the graphs
+```bash
+# From the root directory
+cd graph_builder
+python main.py
+```
+
 ### Starting the Backend
 ```bash
 # From the root directory
@@ -82,13 +89,6 @@ cd frontend
 npm start
 ```
 The React app will start on `http://localhost:8080`
-
-### Processing Documents
-```bash
-# From the root directory
-cd graph_builder
-python main.py
-```
 
 ### GUI Graph Viewer
 ```bash
