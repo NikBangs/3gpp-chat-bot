@@ -9,6 +9,7 @@ import networkx as nx
 import pickle
 import json
 import torch
+import time
 from openai import OpenAI
 
 # Load environment key
@@ -105,6 +106,7 @@ corpus_embeddings = model.encode(corpus, convert_to_tensor=True)
 @app.route("/api/query", methods=["POST"])
 def query():
     try:
+        start_time = time.perf_counter()
         data = request.get_json(force=True)
         print("Received data from frontend:", data)
 
@@ -146,11 +148,12 @@ def query():
                     neighbor_count += 1
 
         full_context = "\n\n".join(context_sections)
-
+        
         # 🔍 Try fuzzy match from cache
         cached_answer = find_similar_cached_response(query_text)
         if cached_answer:
-            print("⚡ Served from fuzzy cache.")
+            end_time = time.perf_counter()
+            print(f"⚡ Served from fuzzy cache. Done in {end_time - start_time:.2f}")
             return jsonify({
                 "answer": cached_answer,
                 "highlight": [],
@@ -201,7 +204,10 @@ Context:
                 temperature=0.4,
                 max_tokens=max_tokens
             )
+            print("Full context:", full_context)
             answer = response.choices[0].message.content.strip()
+            end_time = time.perf_counter()
+            print(f"⚡ Generated the answer searching therough the nodes in {end_time - start_time:.2f}")
         except Exception as e:
             print("❌ Error during OpenAI request:", e)
             return jsonify({"answer": "Sorry, the AI model failed to respond.", "highlight": []}), 500
@@ -218,19 +224,19 @@ Context:
         print("Error processing query:", e)
         return jsonify({"answer": "Server error occurred.", "highlight": []}), 500
 
-@app.route('/api/graph', methods=['GET'])
-def get_graph():
-    filepath = os.path.join(os.path.dirname(__file__), '..', 'data', 'unified_graph.pkl')
-    filepath = os.path.abspath(filepath)
+# @app.route('/api/graph', methods=['GET'])
+# def get_graph():
+#     filepath = os.path.join(os.path.dirname(__file__), '..', 'data', 'unified_graph.pkl')
+#     filepath = os.path.abspath(filepath)
 
-    with open(filepath, "rb") as f:
-        data = pickle.load(f)
+#     with open(filepath, "rb") as f:
+#         data = pickle.load(f)
 
-    graph_data = {
-        "nodes": [{"id": str(node)} for node in data.nodes()],
-        "links": [{"source": str(u), "target": str(v)} for u, v in data.edges()]
-    }
-    return jsonify(graph_data)
+#     graph_data = {
+#         "nodes": [{"id": str(node)} for node in data.nodes()],
+#         "links": [{"source": str(u), "target": str(v)} for u, v in data.edges()]
+#     }
+#     return jsonify(graph_data)
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)

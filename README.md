@@ -81,7 +81,7 @@ The Flask server will start on `http://localhost:5000`
 cd frontend
 npm start
 ```
-The React app will start on `http://localhost:3000`
+The React app will start on `http://localhost:8080`
 
 ### Processing Documents
 ```bash

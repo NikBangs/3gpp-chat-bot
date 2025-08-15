@@ -4,6 +4,7 @@ import pickle
 import networkx as nx
 import os
 import sys
+import time
 
 # --- Project modules ---
 from parser.read_doc import read_doc
@@ -129,6 +130,7 @@ def main():
             print(f"❌ File not found: {rel17_path}")
             return
 
+        start_time = time.perf_counter()
         # -------- Read and Parse --------
         print("📄 Reading documents...")
         try:
@@ -151,13 +153,18 @@ def main():
         flattened17 = {sid: flatten_section(sec) for sid, sec in sections17.items()}
 
         G = build_semantic_graph(flattened10, flattened17)
+        
+        end_time = time.perf_counter()
+        print(f"✅ Graph built with {len(G.nodes)} nodes and {len(G.edges)} edges in {end_time - start_time:.2f} seconds.")
 
-        print(f"✅ Graph built with {len(G.nodes)} nodes and {len(G.edges)} edges.")
 
         # -------- Individual Version Graphs --------
+        start_time = time.perf_counter()
         graph10 = build_graph_from_sections(flattened10)
         graph17 = build_graph_from_sections(flattened17)
-
+        end_time = time.perf_counter()
+        print(f"✅ Individual graph built in {end_time - start_time:.2f} seconds.")
+        
         with open(GRAPH_DIR / "graph_10.pkl", "wb") as f:
             pickle.dump(graph10, f)
         with open(GRAPH_DIR / "graph_17.pkl", "wb") as f:
@@ -169,9 +176,11 @@ def main():
 
         # -------- Summarize Nodes with GPT --------
         try:
+            start_time = time.perf_counter()
             from graphs.summarize_nodes import summarize_graph_nodes
             G = summarize_graph_nodes(G)
-
+            end_time = time.perf_counter()
+            print(f"✅ Node title summarization done in {end_time - start_time:.2f} seconds.")
             # Re-save enriched graph
             with open(graph_path, "wb") as f:
                 pickle.dump(G, f)
@@ -198,20 +207,20 @@ def main():
     visualize_semantic_graph(G, output_html=str(frontend_output_path), sections10=sections10, sections17=sections17)
     print("🎉 Visualization saved to graph.html")
 
-    # -------- Optional: Impact Test --------
-    test_section = "4.3.2"
-    if test_section in G:
-        impacted = downstream_impact(G, test_section)
-        print(f"📌 Sections impacted by change in {test_section}:", impacted)
-    else:
-        print(f"⚠️ Section {test_section} not found in graph.")
+    # # -------- Optional: Impact Test --------
+    # test_section = "4.3.2"
+    # if test_section in G:
+    #     impacted = downstream_impact(G, test_section)
+    #     print(f"📌 Sections impacted by change in {test_section}:", impacted)
+    # else:
+    #     print(f"⚠️ Section {test_section} not found in graph.")
 
-    # -------- Optional: QA Summary --------
-    section_id = input("🔎 Enter a section ID to explain (e.g., 5.2.1): ").strip()
-    if section_id:
-        explanation = generate_user_friendly_summary(G, section_id)
-        print("\n📝 Explanation:\n")
-        print(explanation)
+    # # -------- Optional: QA Summary --------
+    # section_id = input("🔎 Enter a section ID to explain (e.g., 5.2.1): ").strip()
+    # if section_id:
+    #     explanation = generate_user_friendly_summary(G, section_id)
+    #     print("\n📝 Explanation:\n")
+    #     print(explanation)
 
     # -------- GUI Viewer --------
     launch_graph_gui()
